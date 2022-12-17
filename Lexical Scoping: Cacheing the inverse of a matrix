@@ -1,0 +1,59 @@
+# Function that creates a cache object that associates a matrix to its inverse
+
+makeCacheMatrix <- function(x = matrix()) {
+  inverse <- NULL
+  set <- function(y) {
+    x <<- y
+    inverse <<- NULL
+  }
+  get <- function() x
+  
+  # We have an object x related to this function which we can set to any given
+  # value as long as it is a matrix.
+  
+  set_inverse <- function(inv) 
+    if(class(inv)[1] == "matrix") { 
+      inverse <<- inv } else {
+        message("not a matrix")
+      }
+  
+  # Only allows for inverses to be matrices, associates another matrix 
+  # serving as an inverse to a given x (only the true inverse if returned by
+  # the function below)
+  
+  get_inverse <- function() inverse
+  list(set_matrix = set, get_matrix = get,
+       set_inverse = set_inverse,
+       get_inverse = get_inverse)
+  
+  # This allows the inverse to be bound to the original value and stored in cache
+  # once the inverse has already been calculated. With the list we can retrieve 
+  # any of the values of the matrices and inverses already in cache.
+}
+
+
+
+
+
+## Function that calculates inverse matrices and returns their value to the 
+# previous function
+
+cachesolve <- function(x, ...) {
+  inverse <- x$get_inverse()
+  if(!is.null(inverse)) {
+    message("getting cached data")
+    return(inverse)
+  
+  }
+  
+  # This evaluates whether that matrix is already associated to an inverse, if 
+  # so it retrieves it from the cache memory instead of calculating it again
+  
+  data <- x$get_matrix()
+  inverse <- solve(data)
+  x$set_inverse(inverse)
+  return(inverse)
+  
+  # If the matrix isn't stored in cache, it triggers the inverse formula (solve)
+  # and sets that matrix's inverse value to that, storing it in the cache
+}
